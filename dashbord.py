@@ -1,31 +1,145 @@
 import streamlit as st
 import pandas as pd
-import os
 
-st.set_page_config(page_title="Smart RT AI Dashboard", layout="wide")
+import streamlit as st
+import pandas as pd
 
-st.title("🤖 Smart RT AI Dashboard")
-LOG_FILE = "logs/detection_log.csv"
+st.set_page_config(layout="wide")
 
-# cek apakah file ada
-if os.path.exists(LOG_FILE):
+# CSS background
+st.markdown("""
+<style>
 
-    df = pd.read_csv(LOG_FILE)
+.stApp {
+background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+color: white;
+}
 
-    st.subheader("📋 Detection Log")    
-    st.dataframe(df)
+[data-testid="stSidebar"] {
+background-color: #111;
+}
 
-    col1, col2 = st.columns(2)
+</style>
+""", unsafe_allow_html=True)
 
-    with col1:
-        st.subheader("📊 Event Statistik")
-        st.bar_chart(df["event"].value_counts())
+# Konfigurasi halaman
+st.set_page_config(
+    page_title="Smart RT AI",
+    page_icon="🤖",
+    layout="wide"
+)
 
-    with col2:
-        st.subheader("📈 Confidence")
-        st.line_chart(df["confidence"])
+# ======================
+# HEADER
+# ======================
 
-else:
-    st.warning("Belum ada data deteksi")
+st.title("🤖 Smart RT AI")
+st.caption("Smart Neighborhood Monitoring System")
 
-st.write("Dashboard akan update setiap refresh")
+st.divider()
+
+# ======================
+# SIDEBAR
+# ======================
+
+menu = st.sidebar.selectbox(
+    "Menu Dashboard",
+    [
+        "🏠 Dashboard",
+        "👨‍👩‍👧 Data Warga",
+        "📊 Statistik",
+        "📷 Monitoring",
+        "ℹ️ Tentang"
+    ]
+)
+
+st.sidebar.success("System Status : Online")
+
+# ======================
+# DATA CONTOH
+# ======================
+
+data = {
+    "Nama": ["Budi","Siti","Andi","Rina","Dodi","Agus"],
+    "RT": [1,1,2,2,3,3],
+    "Status": ["Aman","Aman","Peringatan","Aman","Aman","Peringatan"]
+}
+
+df = pd.DataFrame(data)
+
+# ======================
+# DASHBOARD
+# ======================
+
+if menu == "🏠 Dashboard":
+
+    st.subheader("Ringkasan Sistem")
+
+    col1,col2,col3,col4 = st.columns(4)
+
+    col1.metric("Total Warga", len(df))
+    col2.metric("Status Aman", (df["Status"]=="Aman").sum())
+    col3.metric("Peringatan", (df["Status"]=="Peringatan").sum())
+    col4.metric("RT Aktif", df["RT"].nunique())
+
+    st.divider()
+
+    st.subheader("Statistik Status Warga")
+
+    status_chart = df["Status"].value_counts()
+    st.bar_chart(status_chart)
+
+# ======================
+# DATA WARGA
+# ======================
+
+elif menu == "👨‍👩‍👧 Data Warga":
+
+    st.subheader("Database Warga")
+
+    st.dataframe(df,use_container_width=True)
+
+# ======================
+# STATISTIK
+# ======================
+
+elif menu == "📊 Statistik":
+
+    st.subheader("Statistik per RT")
+
+    rt_chart = df.groupby("RT").count()["Nama"]
+    st.bar_chart(rt_chart)
+
+# ======================
+# MONITORING
+# ======================
+
+if menu == "Monitoring":
+
+    import streamlit as st
+
+st.title("Monitoring Video")
+
+video_file = st.file_uploader("test,mp4")
+
+if video_file:
+    st.video(video_file)
+
+# ======================
+# TENTANG
+# ======================
+
+elif menu == "ℹ️ Tentang":
+
+    st.subheader("Tentang Smart RT AI")
+
+    st.write("""
+    Smart RT AI adalah sistem monitoring lingkungan berbasis AI
+    untuk meningkatkan keamanan dan pengelolaan data warga.
+    
+    Fitur:
+    - Dashboard monitoring
+    - Statistik warga
+    - Monitoring CCTV
+    - Sistem berbasis web
+    """)
