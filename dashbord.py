@@ -12,7 +12,7 @@ if os.path.exists(LOG_FILE):
 
     df = pd.read_csv(LOG_FILE)
 
-    st.subheader("📋 Detection Log")x
+    st.subheader("📋 Detection Log")    
     st.dataframe(df)
 
     col1, col2 = st.columns(2)
